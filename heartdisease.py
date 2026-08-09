@@ -253,8 +253,9 @@ print("---------------------------------------------------------CRP")
 print(heart_disease_df.info())
 
 heart_disease_df["Homocysteine Level"] = heart_disease_df["Homocysteine Level"].fillna(
-    heart_disease_df["Triglyceride Level"].mean()
+    heart_disease_df["Homocysteine Level"].mean()
 )
+
 # Save cleaned dataset as CSV
 
 heart_disease_df.to_csv("heart_disease_cleaned.csv", index=False)
