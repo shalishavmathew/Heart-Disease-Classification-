@@ -4,6 +4,7 @@ import pandas as pd
 
 print("hello world")
 
+
 heart_disease_df = pd.read_csv("heart_disease.csv")
 
 #--------------------------------------------------------------------------DATA CLEANING-----------------------------------------------------------------------------
@@ -245,11 +246,10 @@ print(heart_disease_df.info())
 
 print(heart_disease_df["CRP Level"].value_counts(dropna=False))
 
-#heart_disease_df["CRP Level"] = heart_disease_df["CRP Level"].fillna(
-#    heart_disease_df["CRP Level"].mean()
-#)
+heart_disease_df = heart_disease_df.dropna(subset=["CRP Level"])
 
 print(heart_disease_df["CRP Level"].unique)
+print("---------------------------------------------------------CRP")
 print(heart_disease_df.info())
 
 
