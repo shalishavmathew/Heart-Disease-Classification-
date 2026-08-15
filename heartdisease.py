@@ -1,7 +1,7 @@
 
 import numpy as np
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
 print("hello world")
 
 
@@ -263,3 +263,16 @@ heart_disease_df.to_csv("heart_disease_cleaned.csv", index=False)
 print("Data cleaning completed!")
 print("File: heart_disease_cleaned.csv")
 
+#-------------------------------Data Modelling/splitting-------------------------
+x=heart_disease_df.drop("Heart Disease Status", axis=1)
+#Feature related data
+y=heart_disease_df["Heart Disease Status"]
+#Label related data
+#First stage in the supervised learning aspect is splitting data
+print(x.head())
+print(y.value_counts())
+x_train, x_test, y_train, y_test = train_test_split(
+    x,
+    y, 
+    test_size=0.2)
+x_train.shape, x_test.shape, y_train.shape, y_test.shape
