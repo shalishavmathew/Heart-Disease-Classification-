@@ -1,9 +1,15 @@
 
 import numpy as np
 import pandas as pd
+<<<<<<< HEAD
 import matplotlib.pyplot as plt
 
+=======
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+>>>>>>> 067562c9b6e9619b2de620014b81deda221a90ac
 print("hello world")
+
 
 heart_disease_df = pd.read_csv("heart_disease.csv")
 
@@ -246,13 +252,15 @@ print(heart_disease_df.info())
 
 print(heart_disease_df["CRP Level"].value_counts(dropna=False))
 
-#heart_disease_df["CRP Level"] = heart_disease_df["CRP Level"].fillna(
-#    heart_disease_df["CRP Level"].mean()
-#)
+heart_disease_df = heart_disease_df.dropna(subset=["CRP Level"])
 
 print(heart_disease_df["CRP Level"].unique)
+print("---------------------------------------------------------CRP")
 print(heart_disease_df.info())
 
+heart_disease_df["Homocysteine Level"] = heart_disease_df["Homocysteine Level"].fillna(
+    heart_disease_df["Homocysteine Level"].mean()
+)
 
 # Save cleaned dataset as CSV
 
@@ -299,3 +307,37 @@ plt.title("Age vs Cholesterol Level by Heart Disease Status")
 plt.legend()
 
 plt.show()
+
+#--------------------------------------Data Mapping------------------------------------
+heart_disease_df["Gender"]=heart_disease_df["Gender"].map({"Male":1,"Female":0})
+heart_disease_df["Exercise Habits"]=heart_disease_df["Exercise Habits"].map({"Low":0,"Medium":1,"High":2})
+heart_disease_df["Smoking"]=heart_disease_df["Smoking"].map({"Yes":1,"No":0})
+heart_disease_df["Family Heart Disease"]=heart_disease_df["Family Heart Disease"].map({"Yes":1,"No":0})
+heart_disease_df["Diabetes"]=heart_disease_df["Diabetes"].map({"Yes":1,"No":0})
+heart_disease_df["High Blood Pressure"]=heart_disease_df["High Blood Pressure"].map({"Yes":1,"No":0})
+heart_disease_df["Low HDL Cholesterol"]=heart_disease_df["Low HDL Cholesterol"].map({"Yes":1,"No":0})
+heart_disease_df["High LDL Cholesterol"]=heart_disease_df["High LDL Cholesterol"].map({"Yes":1,"No":0})
+heart_disease_df["Alcohol Consumption"]=heart_disease_df["Alcohol Consumption"].map({"Low":0,"Medium":1,"High":2})
+heart_disease_df["Stress Level"]=heart_disease_df["Stress Level"].map({"Low":0,"Medium":1,"High":2})
+heart_disease_df["Sugar Consumption"]=heart_disease_df["Sugar Consumption"].map({"Low":0,"Medium":1,"High":2})
+heart_disease_df["Heart Disease Status"]=heart_disease_df["Heart Disease Status"].map({"Yes":1,"No":0})
+#-------------------------------Data Modelling/splitting-------------------------
+x=heart_disease_df.drop("Heart Disease Status", axis=1)
+#Feature related data
+y=heart_disease_df["Heart Disease Status"]
+#Label related data
+#First stage in the supervised learning aspect is splitting data
+print(x.head())
+print(y.value_counts())
+x_train, x_test, y_train, y_test = train_test_split(
+    x,
+    y, 
+    test_size=0.2)
+x_train.shape, x_test.shape, y_train.shape, y_test.shape
+clf=RandomForestClassifier()
+clf.fit(X=x_train,y=y_train)
+y_preds=clf.predict(X=x_test)
+train_accuracy = clf.score(X=x_train, y=y_train)
+test_accuracy=clf.score(X=x_test, y=y_test)
+print(f"{train_accuracy*100}")
+print(f"{test_accuracy*100}")
