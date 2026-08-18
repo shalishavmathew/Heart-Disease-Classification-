@@ -1,6 +1,7 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 print("hello world")
 
@@ -260,3 +261,41 @@ heart_disease_df.to_csv("heart_disease_cleaned.csv", index=False)
 print("Data cleaning completed!")
 print("File: heart_disease_cleaned.csv")
 
+#plotting
+
+plt.hist(heart_disease_df["Age"].dropna(), bins=20)
+plt.xlabel("Age")
+plt.ylabel("Frequency")
+plt.title("Age Distribution")
+plt.show()
+
+# Figure 2: Age vs Cholesterol Level by Heart Disease Status
+
+heart_disease = heart_disease_df[
+    heart_disease_df["Heart Disease Status"] == "Yes"
+]
+
+no_heart_disease = heart_disease_df[
+    heart_disease_df["Heart Disease Status"] == "No"
+]
+
+# Plot patients WITHOUT heart disease
+plt.scatter(
+    no_heart_disease["Age"],
+    no_heart_disease["Cholesterol Level"],
+    label="No Heart Disease"
+)
+
+# Plot patients WITH heart disease
+plt.scatter(
+    heart_disease["Age"],
+    heart_disease["Cholesterol Level"],
+    label="Heart Disease"
+)
+
+plt.xlabel("Age")
+plt.ylabel("Cholesterol Level")
+plt.title("Age vs Cholesterol Level by Heart Disease Status")
+plt.legend()
+
+plt.show()
