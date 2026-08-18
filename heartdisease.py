@@ -1,13 +1,11 @@
 
 import numpy as np
 import pandas as pd
-<<<<<<< HEAD
 import matplotlib.pyplot as plt
-
-=======
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
->>>>>>> 067562c9b6e9619b2de620014b81deda221a90ac
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
 print("hello world")
 
 
@@ -337,7 +335,27 @@ x_train.shape, x_test.shape, y_train.shape, y_test.shape
 clf=RandomForestClassifier()
 clf.fit(X=x_train,y=y_train)
 y_preds=clf.predict(X=x_test)
+
+#-------------------------------Confusion Matrix---------------------------------
+
+cm = confusion_matrix(y_test, y_preds)
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=["No Heart Disease", "Heart Disease"]
+)
+
+disp.plot()
+
+plt.title("Random Forest Confusion Matrix")
+
+#-------------------------------Accuracy-----------------------------------------
+
 train_accuracy = clf.score(X=x_train, y=y_train)
-test_accuracy=clf.score(X=x_test, y=y_test)
-print(f"{train_accuracy*100}")
-print(f"{test_accuracy*100}")
+test_accuracy = clf.score(X=x_test, y=y_test)
+
+print(f"Training Accuracy: {train_accuracy * 100:.2f}%")
+print(f"Testing Accuracy: {test_accuracy * 100:.2f}%")
+
+plt.show()
+
