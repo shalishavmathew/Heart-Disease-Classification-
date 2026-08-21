@@ -1,8 +1,11 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
 print("hello world")
 
 
@@ -264,6 +267,44 @@ heart_disease_df.to_csv("heart_disease_cleaned.csv", index=False)
 print("Data cleaning completed!")
 print("File: heart_disease_cleaned.csv")
 
+#plotting
+
+plt.hist(heart_disease_df["Age"].dropna(), bins=20)
+plt.xlabel("Age")
+plt.ylabel("Frequency")
+plt.title("Age Distribution")
+plt.show()
+
+# Figure 2: Age vs Cholesterol Level by Heart Disease Status
+
+heart_disease = heart_disease_df[
+    heart_disease_df["Heart Disease Status"] == "Yes"
+]
+
+no_heart_disease = heart_disease_df[
+    heart_disease_df["Heart Disease Status"] == "No"
+]
+
+# Plot patients WITHOUT heart disease
+plt.scatter(
+    no_heart_disease["Age"],
+    no_heart_disease["Cholesterol Level"],
+    label="No Heart Disease"
+)
+
+# Plot patients WITH heart disease
+plt.scatter(
+    heart_disease["Age"],
+    heart_disease["Cholesterol Level"],
+    label="Heart Disease"
+)
+
+plt.xlabel("Age")
+plt.ylabel("Cholesterol Level")
+plt.title("Age vs Cholesterol Level by Heart Disease Status")
+plt.legend()
+
+plt.show()
 
 #--------------------------------------Data Mapping------------------------------------
 heart_disease_df["Gender"]=heart_disease_df["Gender"].map({"Male":1,"Female":0})
@@ -294,7 +335,27 @@ x_train.shape, x_test.shape, y_train.shape, y_test.shape
 clf=RandomForestClassifier()
 clf.fit(X=x_train,y=y_train)
 y_preds=clf.predict(X=x_test)
+
+#-------------------------------Confusion Matrix---------------------------------
+
+cm = confusion_matrix(y_test, y_preds)
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=["No Heart Disease", "Heart Disease"]
+)
+
+disp.plot()
+
+plt.title("Random Forest Confusion Matrix")
+
+#-------------------------------Accuracy-----------------------------------------
+
 train_accuracy = clf.score(X=x_train, y=y_train)
-test_accuracy=clf.score(X=x_test, y=y_test)
-print(f"{train_accuracy*100}")
-print(f"{test_accuracy*100}")
+test_accuracy = clf.score(X=x_test, y=y_test)
+
+print(f"Training Accuracy: {train_accuracy * 100:.2f}%")
+print(f"Testing Accuracy: {test_accuracy * 100:.2f}%")
+
+plt.show()
+
