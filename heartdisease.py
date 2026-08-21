@@ -278,7 +278,7 @@ heart_disease_df["Alcohol Consumption"]=heart_disease_df["Alcohol Consumption"].
 heart_disease_df["Stress Level"]=heart_disease_df["Stress Level"].map({"Low":0,"Medium":1,"High":2})
 heart_disease_df["Sugar Consumption"]=heart_disease_df["Sugar Consumption"].map({"Low":0,"Medium":1,"High":2})
 heart_disease_df["Heart Disease Status"]=heart_disease_df["Heart Disease Status"].map({"Yes":1,"No":0})
-#-------------------------------Data Modelling/splitting-------------------------
+#-------------------------------Data Modelling/splitting [Random Forest Classification]-------------------------
 x=heart_disease_df.drop("Heart Disease Status", axis=1)
 #Feature related data
 y=heart_disease_df["Heart Disease Status"]
