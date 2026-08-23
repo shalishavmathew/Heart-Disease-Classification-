@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (confusion_matrix, ConfusionMatrixDisplay, roc_curve,
     roc_auc_score)
-
+from sklearn.metrics import classification_report
 print("hello world")
 
 
@@ -387,4 +387,6 @@ print(f"Training Accuracy: {train_accuracy * 100:.2f}%")
 print(f"Testing Accuracy: {test_accuracy * 100:.2f}%")
 
 plt.show()
+
+print(classification_report(y_test,y_preds))
 
