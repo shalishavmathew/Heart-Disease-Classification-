@@ -4,7 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import (confusion_matrix, ConfusionMatrixDisplay, roc_curve,
+    roc_auc_score)
 
 print("hello world")
 
@@ -332,9 +333,37 @@ x_train, x_test, y_train, y_test = train_test_split(
     y, 
     test_size=0.2)
 x_train.shape, x_test.shape, y_train.shape, y_test.shape
-clf=RandomForestClassifier()
+clf=RandomForestClassifier(  class_weight="balanced")
 clf.fit(X=x_train,y=y_train)
 y_preds=clf.predict(X=x_test)
+
+#-------------------------------ROC Curve---------------------------------
+
+# Get probability of class 1 (Heart Disease)
+y_prob = clf.predict_proba(X=x_test)[:, 1]
+
+# Calculate ROC-AUC
+roc_auc = roc_auc_score(y_test, y_prob)
+
+print(f"ROC-AUC: {roc_auc:.2f}")
+
+# Calculate ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+
+# Plot ROC curve
+plt.plot(fpr, tpr)
+plt.plot([0, 1], [0, 1], linestyle="--")
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate (Recall)")
+plt.title("Random Forest ROC Curve")
+
+plt.show()
+
+print("Actual test values:")
+print(y_test.value_counts())
+print("\nPredicted test values:")
+print(pd.Series(y_preds).value_counts())
 
 #-------------------------------Confusion Matrix---------------------------------
 
