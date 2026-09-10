@@ -391,11 +391,18 @@ plt.show()
 
 print(classification_report(y_test,y_preds))
 #-----------------------------Cross-Validation test----------------------------------
+L_Accuracy=[]
+L_Precision=[]
+L_Est=[]
+#Lists to be placed into an array
 np.random.seed(42)
 for i in range(100,1100,100):
     clfCV=RandomForestClassifier(n_estimators=i, max_depth=int(i/10), class_weight="balanced").fit(x_train,y_train)
+    L_Est.append(i);
     clfEvalScore=clfCV.score(x_test,y_test);
+    L_Accuracy.append(clfEvalScore)
     print(f"Model accuracy {clfEvalScore*100:.2f}")
     CV_score=np.mean(cross_val_score(clfCV,X=x_train,y=y_train,cv=5, scoring="precision"))
+    L_Precision.append(CV_score)
     print(f"Cross-Validation Precision Score for iteration {i}: {CV_score*100:.2f}")
 
