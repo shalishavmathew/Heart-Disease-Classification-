@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (confusion_matrix, ConfusionMatrixDisplay, roc_curve,
     roc_auc_score)
@@ -389,4 +390,12 @@ print(f"Testing Accuracy: {test_accuracy * 100:.2f}%")
 plt.show()
 
 print(classification_report(y_test,y_preds))
+#-----------------------------Cross-Validation test----------------------------------
+np.random.seed(42)
+for i in range(100,1100,100):
+    clfCV=RandomForestClassifier(n_estimators=i, max_depth=int(i/10), class_weight="balanced").fit(x_train,y_train)
+    clfEvalScore=clfCV.score(x_test,y_test);
+    print(f"Model accuracy {clfEvalScore*100:.2f}")
+    CV_score=np.mean(cross_val_score(clfCV,X=x_train,y=y_train,cv=5, scoring="precision"))
+    print(f"Cross-Validation Precision Score for iteration {i}: {CV_score*100:.2f}")
 
