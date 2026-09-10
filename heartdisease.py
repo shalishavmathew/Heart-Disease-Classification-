@@ -396,13 +396,34 @@ L_Precision=[]
 L_Est=[]
 #Lists to be placed into an array
 np.random.seed(42)
-for i in range(100,1100,100):
+
+plt.figure(figsize=(8, 6))
+
+for i in range(100,1100,200):
     clfCV=RandomForestClassifier(n_estimators=i, max_depth=int(i/10), class_weight="balanced").fit(x_train,y_train)
     L_Est.append(i);
     clfEvalScore=clfCV.score(x_test,y_test);
     L_Accuracy.append(clfEvalScore)
     print(f"Model accuracy {clfEvalScore*100:.2f}")
+    
     CV_score=np.mean(cross_val_score(clfCV,X=x_train,y=y_train,cv=5, scoring="precision"))
     L_Precision.append(CV_score)
     print(f"Cross-Validation Precision Score for iteration {i}: {CV_score*100:.2f}")
 
+    # ROC Curve for this iteration
+    y_prob = clfCV.predict_proba(x_test)[:, 1]
+    fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+    roc_auc = roc_auc_score(y_test, y_prob)
+
+    print(f"ROC-AUC for iteration {i}: {roc_auc:.2f}")
+
+    plt.plot(fpr, tpr, label=f"Iteration {i}, AUC = {roc_auc:.2f}")
+
+# Random guessing line
+plt.plot([0, 1], [0, 1], linestyle="--", label="Random Guessing")
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate (Recall)")
+plt.title("ROC Curve Comparison Across Iterations")
+plt.legend()
+plt.show()
