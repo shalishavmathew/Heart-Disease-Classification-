@@ -427,3 +427,7 @@ plt.ylabel("True Positive Rate (Recall)")
 plt.title("ROC Curve Comparison Across Iterations")
 plt.legend()
 plt.show()
+
+accuracy= np.array(L_Accuracy)
+precision= np.array(L_Precision)
+estimators= np.array(L_Est)
