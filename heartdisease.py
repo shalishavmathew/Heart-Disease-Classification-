@@ -1,14 +1,26 @@
 
 import numpy as np
 import pandas as pd
+import time 
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (confusion_matrix, ConfusionMatrixDisplay, roc_curve,
-    roc_auc_score)
+    roc_auc_score, accuracy_score, precision_score, recall_score, f1_score)
 from sklearn.metrics import classification_report
 print("hello world")
+
+def class_rep_light(y_test: np.array,y_preds: np.array):
+    #Prints short version of a classification report
+    accuracy = accuracy_score(y_test, y_preds)
+    precision=precision_score(y_test, y_preds)
+    recall=recall_score(y_test, y_preds)
+    f1=f1_score(y_test, y_preds)
+    print(f"Accuracy: {accuracy*100:.2f}%")
+    print(f"Precision: {precision*100:.2f}%")
+    print(f"Recall: {recall*100:.2f}%")
 
 
 heart_disease_df = pd.read_csv("heart_disease.csv")
@@ -321,6 +333,7 @@ heart_disease_df["Alcohol Consumption"]=heart_disease_df["Alcohol Consumption"].
 heart_disease_df["Stress Level"]=heart_disease_df["Stress Level"].map({"Low":0,"Medium":1,"High":2})
 heart_disease_df["Sugar Consumption"]=heart_disease_df["Sugar Consumption"].map({"Low":0,"Medium":1,"High":2})
 heart_disease_df["Heart Disease Status"]=heart_disease_df["Heart Disease Status"].map({"Yes":1,"No":0})
+
 #-------------------------------Data Modelling/splitting [Random Forest Classification]-------------------------
 x=heart_disease_df.drop("Heart Disease Status", axis=1)
 #Feature related data
@@ -390,6 +403,7 @@ print(f"Testing Accuracy: {test_accuracy * 100:.2f}%")
 plt.show()
 
 print(classification_report(y_test,y_preds))
+
 #-----------------------------Cross-Validation test----------------------------------
 L_Accuracy=[]
 L_Precision=[]
@@ -399,35 +413,81 @@ np.random.seed(42)
 
 plt.figure(figsize=(8, 6))
 
-for i in range(100,1100,200):
-    clfCV=RandomForestClassifier(n_estimators=i, max_depth=int(i/10), class_weight="balanced").fit(x_train,y_train)
-    L_Est.append(i);
-    clfEvalScore=clfCV.score(x_test,y_test);
-    L_Accuracy.append(clfEvalScore)
-    print(f"Model accuracy {clfEvalScore*100:.2f}")
+# for i in range(100,1100,200):
+#     clfCV=RandomForestClassifier(n_estimators=i, max_depth=1000,class_weight="balanced").fit(x_train,y_train)
+#     L_Est.append(i);
+#     clfEvalScore=clfCV.score(x_test,y_test);
+#     L_Accuracy.append(clfEvalScore)
+#     print(f"Model accuracy {clfEvalScore*100:.2f}")
     
-    CV_score=np.mean(cross_val_score(clfCV,X=x_train,y=y_train,cv=5, scoring="precision"))
-    L_Precision.append(CV_score)
-    print(f"Cross-Validation Precision Score for iteration {i}: {CV_score*100:.2f}")
+#     CV_score=np.mean(cross_val_score(clfCV,X=x_train,y=y_train,cv=5, scoring="precision"))
+#     L_Precision.append(CV_score)
+#     print(f"Cross-Validation Precision Score for iteration {i}: {CV_score*100:.2f}")
 
-    # ROC Curve for this iteration
-    y_prob = clfCV.predict_proba(x_test)[:, 1]
-    fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-    roc_auc = roc_auc_score(y_test, y_prob)
+#     # ROC Curve for this iteration
+#     y_prob = clfCV.predict_proba(x_test)[:, 1]
+#     fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+#     roc_auc = roc_auc_score(y_test, y_prob)
 
-    print(f"ROC-AUC for iteration {i}: {roc_auc:.2f}")
+#     print(f"ROC-AUC for iteration {i}: {roc_auc:.2f}")
 
-    plt.plot(fpr, tpr, label=f"Iteration {i}, AUC = {roc_auc:.2f}")
+#     plt.plot(fpr, tpr, label=f"Iteration {i}, AUC = {roc_auc:.2f}")
 
-# Random guessing line
-plt.plot([0, 1], [0, 1], linestyle="--", label="Random Guessing")
+    #-----------------------------Randomized Search----------------------------------
 
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate (Recall)")
-plt.title("ROC Curve Comparison Across Iterations")
-plt.legend()
-plt.show()
+# 1. Define Parameter Distributions
+param_distrib = {
+    "n_estimators": [50, 100, 200, 300, 500],
+    "max_depth": [None, 5, 10, 20],
+    "max_features": ["sqrt", "log2", None],
+    "min_samples_split": [2, 4, 6, 8],
+    "min_samples_leaf": [1, 2, 4, 8]
+}
 
-accuracy= np.array(L_Accuracy)
-precision= np.array(L_Precision)
-estimators= np.array(L_Est)
+# 2. Track execution time
+start_time = time.time()
+
+# 3. 
+clf = RandomForestClassifier(n_jobs=-1)
+
+# 4. Configure RandomizedSearchCV
+n_iter = 50
+rs_clf = RandomizedSearchCV(
+    estimator=clf,
+    param_distributions=param_distrib,
+    n_iter=n_iter,
+    cv=5,
+    verbose=2,
+    random_state=42,
+    n_jobs=-1
+)
+# 5. Fit to training data
+rs_clf.fit(x_train, y_train)
+print(rs_clf.best_params_)
+rs_y_preds = rs_clf.predict(x_test)
+class_rep_light(y_test, rs_y_preds)
+
+# # Random guessing line
+# plt.plot([0, 1], [0, 1], linestyle="--", label="Random Guessing")
+
+# plt.xlabel("False Positive Rate")
+# plt.ylabel("True Positive Rate (Recall)")
+# plt.title("ROC Curve Comparison Across Iterations")
+# plt.legend()
+# plt.show()
+
+# accuracy= np.array(L_Accuracy)
+# precision= np.array(L_Precision)
+# estimators= np.array(L_Est)
+
+# estimators = pd.Series(L_Est)
+# accuracy = pd.Series(L_Accuracy)
+# precision = pd.Series(L_Precision)
+
+# results_df = pd.DataFrame({
+#     "Estimators": estimators,
+#     "Accuracy": accuracy,
+#     "Precision": precision 
+# })
+
+# results_df.to_csv("test.csv", index=False)
